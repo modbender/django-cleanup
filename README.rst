@@ -1,11 +1,12 @@
-Django Cleanup
+Django Cloudflare Cleanup
 **************
-|Version| |Status| |License|
+
+**Work in progress**
 
 Features
 ========
-The django-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
-subclasses. When a :code:`FileField`'s value is changed and the model is saved, the old file is
+The django-cloudflare-cleanup app automatically deletes files for :code:`FileField`, :code:`ImageField` and
+subclasses from cloudflare cache only. When a :code:`FileField`'s value is changed and the model is saved, the old file is
 deleted. When a model that has a :code:`FileField` is deleted, the file is also deleted. A file that
 is set as the :code:`FileField`'s default value will not be deleted.
 
@@ -18,7 +19,7 @@ Compatibility
 
 How does it work?
 =================
-In order to track changes of a :code:`FileField` and facilitate file deletions, django-cleanup
+In order to track changes of a :code:`FileField` and facilitate file deletions, django-cloudflare-cleanup
 connects :code:`post_init`, :code:`pre_save`, :code:`post_save` and :code:`post_delete` signals to
 signal handlers for each :code:`INSTALLED_APPS` model that has a :code:`FileField`. In order to tell
 whether or not a :code:`FileField`'s value has changed a local cache of original values is kept on
@@ -37,29 +38,29 @@ Installation
 ============
 ::
 
-    pip install django-cleanup
+    *Coming Soon*
 
 
 Configuration
 =============
-Add ``django_cleanup`` to the bottom of ``INSTALLED_APPS`` in ``settings.py``
+Add ``django_cloudflare_cleanup.apps.CloudflareCleanupConfig`` to the bottom of ``INSTALLED_APPS`` in ``settings.py``
 
 .. code-block:: py
 
     INSTALLED_APPS = (
         ...,
-        'django_cleanup.apps.CleanupConfig',
+        'django_cloudflare_cleanup.apps.CloudflareCleanupConfig',
     )
 
 That is all, no other configuration is necessary.
 
 Note: Order of ``INSTALLED_APPS`` is important. To ensure that exceptions inside other apps' signal
-handlers do not affect the integrity of file deletions within transactions, ``django_cleanup``
+handlers do not affect the integrity of file deletions within transactions, ``django_cloudflare_cleanup.apps.CloudflareCleanupConfig``
 should be placed last in ``INSTALLED_APPS``.
 
 Troubleshooting
 ===============
-If you notice that ``django-cleanup`` is not removing files when expected, check that your models
+If you notice that ``django-cloudflare-cleanup`` is not removing files when expected, check that your models
 are being properly
 `loaded <https://docs.djangoproject.com/en/stable/ref/applications/#how-applications-are-loaded>`_:
 
@@ -67,7 +68,7 @@ are being properly
     Otherwise, the application registry may not be fully populated at this point, which could cause
     the ORM to malfunction.
 
-If your models are not loaded, ``django-cleanup`` will not be able to discover their
+If your models are not loaded, ``django-cloudflare-cleanup`` will not be able to discover their
 ``FileField``'s.
 
 You can check if your ``Model`` is loaded by using
@@ -79,13 +80,13 @@ You can check if your ``Model`` is loaded by using
 
 Advanced
 ========
-This section contains additional functionality that can be used to interact with django-cleanup for
+This section contains additional functionality that can be used to interact with django-cloudflare-cleanup for
 special cases.
 
 Signals
 -------
-To facilitate interactions with other django apps django-cleanup sends the following signals which
-can be imported from :code:`django_cleanup.signals`:
+To facilitate interactions with other django apps django-cloudflare-cleanup sends the following signals which
+can be imported from :code:`django_cloudflare_cleanup.signals`:
 
 - :code:`cleanup_pre_delete`: just before a file is deleted. Passes a :code:`file` keyword argument.
 - :code:`cleanup_post_delete`: just after a file is deleted. Passes a :code:`file` keyword argument.
@@ -94,7 +95,7 @@ Signals example for sorl.thumbnail:
 
 .. code-block:: py
 
-    from django_cleanup.signals import cleanup_pre_delete
+    from django_cloudflare_cleanup.signals import cleanup_pre_delete
     from sorl.thumbnail import delete
 
     def sorl_delete(**kwargs):
@@ -105,11 +106,11 @@ Signals example for sorl.thumbnail:
 Refresh the cache
 -----------------
 There have been rare cases where the cache would need to be refreshed. To do so the
-:code:`django_cleanup.cleanup.refresh` method can be used:
+:code:`django_cloudflare_cleanup.cleanup.refresh` method can be used:
 
 .. code-block:: py
 
-    from django_cleanup import cleanup
+    from django_cloudflare_cleanup import cleanup
 
     cleanup.refresh(model_instance)
 
@@ -119,7 +120,7 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 
 .. code-block:: py
 
-    from django_cleanup import cleanup
+    from django_cloudflare_cleanup import cleanup
 
     @cleanup.ignore
     class MyModel(models.Model):
@@ -128,12 +129,12 @@ Ignore a model and do not perform cleanup when the model is deleted or its files
 How to run tests
 ================
 Install, setup and use pyenv_ to install all the required versions of cPython
-(see the `tox.ini <https://github.com/un1t/django-cleanup/blob/master/tox.ini>`_).
+(see the `tox.ini <https://github.com/un1t/django-cloudflare-cleanup/blob/master/tox.ini>`_).
 
-Setup pyenv_ to have all versions of python activated within your local django-cleanup repository.
+Setup pyenv_ to have all versions of python activated within your local django-cloudflare-cleanup repository.
 Ensuring that the python 3.8 that was installed is first priority.
 
-Install tox_ on python 3.8 and run the :code:`tox` command from your local django-cleanup
+Install tox_ on python 3.8 and run the :code:`tox` command from your local django-cloudflare-cleanup
 repository.
 
 How to write tests
@@ -150,7 +151,7 @@ For details on why this is required see `here
 
 License
 =======
-django-cleanup is free software under terms of the:
+django-cloudflare-cleanup is free software under terms of the:
 
 MIT License
 
@@ -179,12 +180,12 @@ SOFTWARE.
 .. _pyenv: https://github.com/pyenv/pyenv
 .. _tox: https://tox.readthedocs.io/en/latest/
 
-.. |Version| image:: https://img.shields.io/pypi/v/django-cleanup.svg
-   :target: https://pypi.python.org/pypi/django-cleanup/
+.. |Version| image:: https://img.shields.io/pypi/v/django-cloudflare-cleanup.svg
+   :target: https://pypi.python.org/pypi/django-cloudflare-cleanup/
    :alt: PyPI Package
-.. |Status| image:: https://travis-ci.org/un1t/django-cleanup.svg?branch=master
-   :target: https://travis-ci.org/un1t/django-cleanup
+.. |Status| image:: https://travis-ci.org/un1t/django-cloudflare-cleanup.svg?branch=master
+   :target: https://travis-ci.org/un1t/django-cloudflare-cleanup
    :alt: Build Status
 .. |License| image:: https://img.shields.io/badge/license-MIT-maroon
-   :target: https://github.com/un1t/django-cleanup/blob/master/LICENSE
+   :target: https://github.com/un1t/django-cloudflare-cleanup/blob/master/LICENSE
    :alt: MIT License
